@@ -12,6 +12,8 @@
 #include <half.h>
 
 #include <cassert>
+#include <cstdint>
+#include <fstream>
 #include <iostream>
 
 #include "film/image_buffer.h"
@@ -275,6 +277,33 @@ void ImageIO::SaveEXR(const DeepImageBuffer& buf, const std::string filename) {
     file.writePixels(height);
 
     std::clog << "Saved EXR: " << filename << std::endl;
+}
+
+void ImageIO::SaveKebab(const DeepImageBuffer& buf, const std::string& filename) {
+    // File stream that will write out to the filesystem
+    std::ofstream out(filename, std::ios::binary);
+
+    // Serialize the header to our file
+    KebabHeader header = {
+        .width = static_cast<uint32_t>(buf.width_),
+        .height = static_cast<uint32_t>(buf.height_),
+        .totalSamples = static_cast<uint64_t>(buf.allSamples_.size()),
+        .totalPixels = static_cast<uint32_t>(buf.pixelOffsets_.size())
+    };
+    out.write(reinterpret_cast<const char*>(&header), sizeof(header));
+
+    // Serialize the offsets
+    // Save the map of the image (offsets are type size_t)
+    size_t offsetBytes = buf.pixelOffsets_.size() * sizeof(size_t);
+    out.write(reinterpret_cast<const char*>(buf.pixelOffsets_.data()), offsetBytes);
+
+    // Serialize the samples
+    // Save the map of the image (samples are type DeepSample)
+    size_t sampleBytes = buf.allSamples_.size() * sizeof(DeepSample);
+    out.write(reinterpret_cast<const char*>(buf.allSamples_.data()), sampleBytes);
+
+    // Close file stream
+    out.close();
 }
 
 }  // namespace skwr
