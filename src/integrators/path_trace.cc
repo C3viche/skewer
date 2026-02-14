@@ -1,6 +1,5 @@
 #include "integrators/path_trace.h"
 
-#include <algorithm>
 #include <atomic>
 #include <mutex>
 #include <thread>
@@ -8,27 +7,16 @@
 
 #include "core/constants.h"
 #include "core/sampling.h"
-#include "core/spectrum.h"
 #include "film/film.h"
-#include "materials/material.h"
+#include "integrators/path_sample.h"
+#include "kernels/path_kernel.h"
 #include "scene/camera.h"
-#include "scene/material_scatter.h"
+#include "scene/light.h"
 #include "scene/scene.h"
 #include "session/render_options.h"
 
 namespace skwr {
 
-/**
- * In a recursive renderer (RTIOW), light is calculated as:
- *          Color = DirectLight + Albedo × RecursiveCall()
- * In our iterative renderer, we keep a running variable called Throughput (β or beta).
- * It represents "what fraction of light from the next bounce will actually make it back to the
- * camera?" AKA the fraction of light that survives up to this point (from the camera)
- * Start: β = 1.0 (White)
- * Bounce 1 (Red Wall): β = 1.0 × 0.5(Red) = 0.5
- * Bounce 2 (Grey Floor): β = 0.5 × 0.5(Grey) = 0.25
- * Hit Light (Intensity 10): FinalColor += β × 10 = 2.5
- */
 void PathTrace::Render(const Scene& scene, const Camera& cam, Film* film,
                        const IntegratorConfig& config) {
     int width = film->width();
@@ -54,6 +42,7 @@ void PathTrace::Render(const Scene& scene, const Camera& cam, Film* film,
             int y = next_scanline.fetch_add(1);
             if (y >= height) break;
 
+            std::clog.flush();
             for (int x = 0; x < width; ++x) {
                 for (int s = 0; s < config.samples_per_pixel; ++s) {
                     RNG rng = MakeDeterministicPixelRNG(x, y, width, s);
@@ -61,39 +50,13 @@ void PathTrace::Render(const Scene& scene, const Camera& cam, Film* film,
                     Float v = 1.0f - (Float(y) + rng.UniformFloat()) / height;
 
                     Ray r = cam.GetRay(u, v);
-                    SurfaceInteraction si;
-                    const Float t_min = kShadowEpsilon;
-                    Spectrum L(0.0f);     // Accumulated Radiance (color)
-                    Spectrum beta(1.0f);  // Throughput (attenuation)
 
-                    // "Bounce" loop - iterative not recursive tho
-                    for (int depth = 0; depth < config.max_depth; ++depth) {
-                        if (!scene.Intersect(r, t_min, kInfinity, &si)) {
-                            Spectrum sky_color(0.5f, 0.7f, 1.0f);
-                            L += beta * sky_color;
-                            break;
-                        }
+                    PathSample result = Li(r, scene, rng, config);
 
-                        const Material& mat = scene.GetMaterial(si.material_id);
+                    float weight = 1.0f;
+                    film->AddSample(x, y, result.L, weight);
 
-                        Spectrum attenuation;
-                        Ray scattered_ray;
-
-                        if (Scatter(mat, r, si, rng, attenuation, scattered_ray)) {
-                            beta *= attenuation;
-                            r = scattered_ray;
-                        } else {
-                            break;
-                        }
-
-                        // Russian Roulette
-                        if (depth > 3) {
-                            Float p = std::max(beta.r(), std::max(beta.g(), beta.b()));
-                            if (rng.UniformFloat() > p) break;
-                            beta = beta * (1.0f / p);
-                        }
-                    }
-                    film->AddSample(x, y, L, 1.0f);
+                    if (config.enable_deep) film->AddDeepSample(x, y, result, weight);
                 }
             }
 
