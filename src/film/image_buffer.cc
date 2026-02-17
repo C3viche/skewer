@@ -1,4 +1,5 @@
 #include "film/image_buffer.h"
+
 #include <ImfArray.h>
 
 #include <cassert>
@@ -14,7 +15,9 @@ ImageBuffer::ImageBuffer(int width, int height)
     : width_(width), height_(height), pixels_(width * height) {}
 
 void ImageBuffer::SetPixel(int x, int y, const Spectrum& s) const {
-    if (x < 0 || x >= width_ || y < 0 || y >= height_) { return; }
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) {
+        return;
+    }
     pixels_[(y * width_) + x] = s;
 }
 

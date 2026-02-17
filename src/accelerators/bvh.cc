@@ -69,7 +69,7 @@ static void BVH::build(std::vector<Triangle>& triangles, const std::vector<Mesh>
 }
 
 static void BVH::Subdivide(uint32_t node_idx, uint32_t first_tri, uint32_t tri_count,
-                    std::vector<BVHPrimitiveInfo>& primitive_info) {
+                           std::vector<BVHPrimitiveInfo>& primitive_info) {
     BVHNode& node = nodes_[node_idx];
 
     // Calculate Bounds for this node

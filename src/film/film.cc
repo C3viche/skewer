@@ -9,9 +9,10 @@ Film::Film(int width, int height) : width_(width), height_(height) {
     pixels_.resize(width_ * height_);
 }
 
-void Film::AddSample(int x, int y, const Spectrum&  /*l*/, float weight) const {
-    if (x < 0 || x >= width_ || y < 0 || y >= height_) { return;
-}
+void Film::AddSample(int x, int y, const Spectrum& /*l*/, float weight) const {
+    if (x < 0 || x >= width_ || y < 0 || y >= height_) {
+        return;
+    }
 
     int const index = (y * width_) + x;  // row-major order
 

@@ -2,8 +2,6 @@
 
 #include <cmath>
 
-#include <cmath>
-
 #include "core/constants.h"
 #include "core/rng.h"
 #include "core/sampling.h"
@@ -58,7 +56,7 @@ auto SampleLight(const Scene& scene, const AreaLight& light, RNG& rng) -> LightS
             result.pdf = 1.0F / area;
         } else {
             result.pdf = 0;
-}
+        }
     }
 
     return result;

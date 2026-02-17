@@ -36,8 +36,8 @@ class Scene {
     const std::vector<AreaLight>& Lights() const { return lights_; }
 
     static void Build();  // Construct the BVH from the shapes list
-    static bool Intersect(const Ray& r, Float t_min, Float t_max, SurfaceInteraction* si) ;
-    static bool IntersectBVH(const Ray& r, Float t_min, Float t_max, SurfaceInteraction* si) ;
+    static bool Intersect(const Ray& r, Float t_min, Float t_max, SurfaceInteraction* si);
+    static bool IntersectBVH(const Ray& r, Float t_min, Float t_max, SurfaceInteraction* si);
 
   private:
     std::vector<Sphere> spheres_;

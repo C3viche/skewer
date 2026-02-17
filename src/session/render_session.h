@@ -39,7 +39,7 @@ class RenderSession {
     // EXECUTE: Create the Integrator and tell it to run on the Scene
     static void Render();
 
-    static void Save() ;
+    static void Save();
 
   private:
     // The 'World' (Geometry, Lights, Accelerators)

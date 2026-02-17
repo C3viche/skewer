@@ -22,8 +22,8 @@ namespace skwr {
 
 // Helper to compute the base pointer offset for OpenEXR frame buffers
 template <typename T>
-static auto MakeBasePointer(T* data, int min_x, int min_y, size_t x_stride,
-                             size_t y_stride) -> char* {
+static auto MakeBasePointer(T* data, int min_x, int min_y, size_t x_stride, size_t y_stride)
+    -> char* {
     return reinterpret_cast<char*>(data) - (static_cast<ptrdiff_t>(min_x) * x_stride) -
            (static_cast<ptrdiff_t>(min_y) * y_stride);
 }
@@ -35,9 +35,9 @@ static void InsertDeepSlice(Imf::DeepFrameBuffer& fb, const char* name, void* pt
     size_t x_stride = sizeof(float*);
     size_t y_stride = x_stride * width;
 
-    fb.insert(name,
-              Imf::DeepSlice(pixelType, makeBasePointer(ptrs, min_x, min_y, width, x_stride, y_stride),
-                             x_stride, y_stride, sample_stride));
+    fb.insert(name, Imf::DeepSlice(pixelType,
+                                   makeBasePointer(ptrs, min_x, min_y, width, x_stride, y_stride),
+                                   x_stride, y_stride, sample_stride));
 }
 
 // =============================================================================================
@@ -98,8 +98,8 @@ static auto ImageIO::LoadEXR(const std::string& filename) -> DeepImageBuffer {
                     sample_stride);
 
     if (has_z_back) {
-        insertDeepSlice(frame_buffer, "ZBack", &zBackPtrs[0][0], Imf_3_2::FLOAT, min_x, min_y, width,
-                        sample_stride);
+        insertDeepSlice(frame_buffer, "ZBack", &zBackPtrs[0][0], Imf_3_2::FLOAT, min_x, min_y,
+                        width, sample_stride);
     }
 
     file.setFrameBuffer(frame_buffer);

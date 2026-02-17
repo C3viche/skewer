@@ -27,7 +27,7 @@ static std::unique_ptr<Integrator> CreateIntegrator(IntegratorType type) {
 // Initialize pointers to nullptr or default states
 // Pointers default to nullptr implicitly, but explicit is fine
 RenderSession::RenderSession() = default;
- // Unique_ptr handles cleanup automatically
+// Unique_ptr handles cleanup automatically
 
 /**
  * Builds the test scene. If obj_file is non-empty, loads it as an object

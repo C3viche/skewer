@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-#include <cmath>
 #include "core/constants.h"
 #include "core/onb.h"
 #include "core/ray.h"
@@ -15,25 +14,29 @@
 
 namespace skwr {
 
-auto EvalBSDF(const Material& mat, const Vec3&  /*wo*/, const Vec3& wi, const Vec3& n) -> Spectrum {
+auto EvalBSDF(const Material& mat, const Vec3& /*wo*/, const Vec3& wi, const Vec3& n) -> Spectrum {
     // Specular materials (Metal, Glass) are Dirac Deltas (infinity) at the right angle, 0 otherwise
     // so just return Black here because Sample() should handle them
-    if (mat.type != MaterialType::Lambertian) { return Spectrum(0.F);
-}
+    if (mat.type != MaterialType::Lambertian) {
+        return Spectrum(0.F);
+    }
 
     Float const cosine = Dot(wi, n);
-    if (cosine <= 0) { return Spectrum(0.F);  // if light coming from below surface, block it
-}
-    return mat.albedo * (1.0F / kPi);       // Lambertian is constant
+    if (cosine <= 0) {
+        return Spectrum(0.F);  // if light coming from below surface, block it
+    }
+    return mat.albedo * (1.0F / kPi);  // Lambertian is constant
 }
 
-auto PdfBSDF(const Material& mat, const Vec3&  /*wo*/, const Vec3& wi, const Vec3 n) -> Float {
-    if (mat.type != MaterialType::Lambertian) { return 0.F;
-}
+auto PdfBSDF(const Material& mat, const Vec3& /*wo*/, const Vec3& wi, const Vec3 n) -> Float {
+    if (mat.type != MaterialType::Lambertian) {
+        return 0.F;
+    }
 
     Float const cosine = Dot(wi, n);
-    if (cosine <= 0) { return 0.F;
-}
+    if (cosine <= 0) {
+        return 0.F;
+    }
     return cosine * (1.0F / kPi);  // Cos-weighted sampling
 }
 
@@ -61,8 +64,9 @@ auto SampleMetal(const Material& mat, const SurfaceInteraction& si, RNG& rng, Ve
 
     // Check if valid (above surface)
     Float const cosine = Dot(wi, si.n);
-    if (cosine <= 0) { return false;
-}
+    if (cosine <= 0) {
+        return false;
+    }
 
     // Delta Distribution Logic
     pdf = 1.0F;
@@ -95,7 +99,7 @@ auto SampleDielectric(const Material& mat, const SurfaceInteraction& si, RNG& rn
     return true;
 }
 
-auto SampleBSDF(const Material& mat, const Ray&  /*r_in*/, const SurfaceInteraction& si, RNG& rng,
+auto SampleBSDF(const Material& mat, const Ray& /*r_in*/, const SurfaceInteraction& si, RNG& rng,
                 Vec3& wi, Float& pdf, Spectrum& f) -> bool {
     switch (mat.type) {
         case MaterialType::Lambertian:

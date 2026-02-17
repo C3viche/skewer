@@ -1,9 +1,6 @@
 #include "io/obj_loader.h"
 
 #include <cmath>
-
-#include <cmath>
-
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -37,7 +34,8 @@ auto ConvertObjMaterial(const tinyobj::material_t& mtl) -> Material {
     }
 
     // 2. TRANSPARENCY / GLASS
-    bool const is_glass_illum = (mtl.illum == 4 || mtl.illum == 6 || mtl.illum == 7 || mtl.illum == 9);
+    bool const is_glass_illum =
+        (mtl.illum == 4 || mtl.illum == 6 || mtl.illum == 7 || mtl.illum == 9);
     if (mtl.dissolve < 0.99F || is_glass_illum) {
         mat.type = MaterialType::Dielectric;
         mat.albedo = Spectrum(1.0F, 1.0F, 1.0F);
@@ -106,10 +104,12 @@ static auto LoadOBJ(const std::string& filename, Scene& scene, const Vec3& scale
     Vec3 bbox_max(-kInfinity, -kInfinity, -kInfinity);
     for (size_t i = 0; i < attrib.vertices.size(); i += 3) {
         for (int a = 0; a < 3; a++) {
-            if (attrib.vertices[i + a] < bbox_min[a]) { bbox_min[a] = attrib.vertices[i + a];
-}
-            if (attrib.vertices[i + a] > bbox_max[a]) { bbox_max[a] = attrib.vertices[i + a];
-}
+            if (attrib.vertices[i + a] < bbox_min[a]) {
+                bbox_min[a] = attrib.vertices[i + a];
+            }
+            if (attrib.vertices[i + a] > bbox_max[a]) {
+                bbox_max[a] = attrib.vertices[i + a];
+            }
         }
     }
     Vec3 const extent = bbox_max - bbox_min;

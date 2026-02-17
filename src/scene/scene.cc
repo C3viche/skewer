@@ -44,15 +44,18 @@ auto Scene::Intersect(const Ray& r, Float t_min, Float t_max, SurfaceInteraction
 }
 
 auto Scene::IntersectBVH(const Ray& r, Float t_min, Float t_max, SurfaceInteraction* si) -> bool {
-    if (bvh_.IsEmpty()) { return false;
-}
+    if (bvh_.IsEmpty()) {
+        return false;
+    }
 
     bool hit_anything = false;
     Float closest_t = t_max;
 
     // using precomputed inverse for aabb check
     const Vec3& inv_dir = r.inv_direction();
-    const int dir_is_neg[3] = {static_cast<const int>(inv_dir.x() < 0), static_cast<const int>(inv_dir.y() < 0), static_cast<const int>(inv_dir.z() < 0)};
+    const int dir_is_neg[3] = {static_cast<const int>(inv_dir.x() < 0),
+                               static_cast<const int>(inv_dir.y() < 0),
+                               static_cast<const int>(inv_dir.z() < 0)};
 
     // stack of 64 is standard 2^64 triangles = a lot of tris
     int nodes_to_visit[64];
