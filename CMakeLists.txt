@@ -14,7 +14,38 @@ cmake_policy(SET CMP0135 NEW)
 # Use system-installed OpenEXR and Imath (install via apt-get or brew)
 find_package(Imath REQUIRED)
 find_package(OpenEXR REQUIRED)
-find_package(ZLIB REQUIRED) # Apparently zlib is sometimes required (I guess for compression?)
+find_package(ZLIB REQUIRED) # Apparently zlib is sometimes required
+
+# Protobuf stuff
+find_package(Protobuf CONFIG REQUIRED)
+find_package(gRPC CONFIG REQUIRED)
+
+set(RENDERER_PROTO "${CMAKE_SOURCE_DIR}/api/proto/renderer/v1/renderer.proto")
+set(PROTO_IMPORT_DIR "${CMAKE_SOURCE_DIR}/api/proto")
+set(GEN_DIR "${CMAKE_BINARY_DIR}/generated")
+file(MAKE_DIRECTORY ${GEN_DIR})
+
+add_custom_command(
+    OUTPUT "${GEN_DIR}/renderer/v1/renderer.pb.cc"
+           "${GEN_DIR}/renderer/v1/renderer.pb.h"
+           "${GEN_DIR}/renderer/v1/renderer.grpc.pb.cc"
+           "${GEN_DIR}/renderer/v1/renderer.grpc.pb.h"
+    COMMAND protobuf::protoc
+    ARGS --cpp_out "${GEN_DIR}"
+         --grpc_out "${GEN_DIR}"
+         --plugin=protoc-gen-grpc=$<TARGET_FILE:gRPC::grpc_cpp_plugin>
+         -I "${PROTO_IMPORT_DIR}"
+         "${RENDERER_PROTO}"
+    DEPENDS "${RENDERER_PROTO}"
+)
+
+# Create a library for the generated code
+add_library(renderer_grpc_proto
+    "${GEN_DIR}/renderer/v1/renderer.pb.cc"
+    "${GEN_DIR}/renderer/v1/renderer.grpc.pb.cc"
+)
+target_link_libraries(renderer_grpc_proto PUBLIC gRPC::grpc++ protobuf::libprotobuf)
+target_include_directories(renderer_grpc_proto PUBLIC "${GEN_DIR}")
 
 # Fetch nlohmann/json for scene loading
 include(FetchContent)
@@ -57,4 +88,5 @@ target_link_libraries(skewer-render
     Imath::Imath
     OpenEXR::OpenEXR
     ZLIB::ZLIB
+    renderer_grpc_proto
 )
