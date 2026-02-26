@@ -6,9 +6,9 @@
 #include <memory>
 #include <vector>
 
-#include "core/color.h"
+#include "core/color/color.h"
+#include "core/sampling/path_sample.h"
 #include "film/image_buffer.h"
-#include "integrators/path_sample.h"
 
 namespace skwr {
 

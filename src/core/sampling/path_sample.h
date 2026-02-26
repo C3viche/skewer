@@ -1,10 +1,10 @@
-#ifndef SKWR_INTEGRATORS_PATH_SAMPLE_H_
-#define SKWR_INTEGRATORS_PATH_SAMPLE_H_
+#ifndef SKWR_SAMPLING_PATH_SAMPLE_H_
+#define SKWR_SAMPLING_PATH_SAMPLE_H_
 
 #include <vector>
 
-#include "core/color.h"
-#include "core/spectrum.h"
+#include "core/color/color.h"
+#include "core/spectral/spectrum.h"
 
 namespace skwr {
 
@@ -25,4 +25,4 @@ struct PathSample {
 
 }  // namespace skwr
 
-#endif  // SKWR_INTEGRATORS_PATH_SAMPLE_H_
+#endif  // SKWR_SAMPLING_PATH_SAMPLE_H_

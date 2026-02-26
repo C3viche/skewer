@@ -1,10 +1,10 @@
-#ifndef SKWR_SCENE_SURFACE_INTERACTION_H_
-#define SKWR_SCENE_SURFACE_INTERACTION_H_
+#ifndef SKWR_CORE_SAMPLING_SURFACE_INTERACTION_H_
+#define SKWR_CORE_SAMPLING_SURFACE_INTERACTION_H_
 
 #include <cstdint>
 
+#include "core/math/vec3.h"
 #include "core/ray.h"
-#include "core/vec3.h"
 
 /* TODO: Implement Deferred Differential Geometry */
 
@@ -20,9 +20,12 @@ struct SurfaceInteraction {
     bool front_face;  // Is normal pointing at ray? (Is it the outside face?)
     uint32_t material_id;
 
+    // UV and tangent frame
+    Vec3 uv;          // Surface UV (z unused)
+    Vec3 dpdu, dpdv;  // Surface tangents (for normal mapping/anisotropy)
+
     // Shading data
-    Vec3 n_shading;   // smooth normal (interpolated)
-    Vec3 dpdu, dpdv;  // Tangents (for bump mapping/anisotropy)
+    Vec3 n_shading;  // smooth normal (interpolated)
 
     // Helper to align normal against the incoming ray
     inline void SetFaceNormal(const Ray& r, const Vec3& outward_normal) {
@@ -34,4 +37,4 @@ struct SurfaceInteraction {
 
 }  // namespace skwr
 
-#endif  // SKWR_SCENE_SURFACE_INTERACTION_H_
+#endif  // SKWR_CORE_SAMPLING_SURFACE_INTERACTION_H_
