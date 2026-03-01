@@ -23,6 +23,7 @@ endif()
 
 # Loom compositor logic (composition/merging) sits here.
 add_library(loom_compositor STATIC
+    src/utils.cc
     src/deep_compositor.cc
     src/deep_volume.cc
 )
